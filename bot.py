@@ -988,10 +988,26 @@ def main():
     successful = 0
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(
-            headless=True,
-            executable_path=CHROME_PATH
-        )
+        # Если бот запущен внутри GitHub Actions
+        if os.getenv("GITHUB_ACTIONS") == "true":
+
+            print("Запуск в GitHub Actions")
+
+            browser = p.chromium.launch(
+                headless=True,
+                channel="chrome"
+            )
+
+        # Если запускаем на своём Mac
+        else:
+
+            print("Запуск на Mac")
+
+            browser = p.chromium.launch(
+                headless=True,
+                executable_path=CHROME_PATH
+            )
+
 
         page = browser.new_page()
 
