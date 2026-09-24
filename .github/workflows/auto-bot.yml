@@ -1,0 +1,50 @@
+name: Automatic Google Form Bot
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: "44 2 25 9 *"
+      timezone: "Europe/Moscow"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: google-form-bot
+  cancel-in-progress: false
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Скачать проект
+        uses: actions/checkout@v4
+
+      - name: Установить Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Установить Playwright
+        run: |
+          python -m pip install --upgrade pip
+          pip install playwright==1.63.0
+
+      - name: Запустить бота
+        run: python bot.py
+
+      - name: Сохранить историю заведений
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet -- places_history.json; then
+            echo "История не изменилась"
+          else
+            git add places_history.json
+            git commit -m "Update places history"
+            git pull --rebase origin main
+            git push origin main
+          fi
