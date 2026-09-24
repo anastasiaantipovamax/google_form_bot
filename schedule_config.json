@@ -1,0 +1,16 @@
+{
+  "responses_per_day": 3,
+  "start_time": "01:37",
+  "end_time": "01:42",
+  "minimum_gap_minutes": 2,
+  "active_weekdays": [
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday"
+  ],
+  "timezone": "Europe/Moscow"
+}
