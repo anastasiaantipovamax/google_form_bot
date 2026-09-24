@@ -2,6 +2,7 @@ from playwright.sync_api import sync_playwright
 import random
 import json
 import os
+import re
 
 
 # =====================================================
@@ -941,19 +942,84 @@ def complete_form(page, number):
 
     print("Отправляю форму...")
 
-    submit_button = page.get_by_role(
-        "button",
-        name="Отправить",
-        exact=True
+    submit_pattern = re.compile(
+        r"Отправить|Submit",
+        re.IGNORECASE
     )
 
-    submit_button.click()
+    # Ищем кнопку отправки
+    submit_button = page.get_by_role(
+        "button",
+        name=submit_pattern
+    )
 
-    # Даём Google время обработать ответ
-    page.wait_for_timeout(2000)
+    # Запасной вариант поиска
+    if submit_button.count() == 0:
+        submit_button = page.locator(
+            '[role="button"]'
+        ).filter(
+            has_text=submit_pattern
+        )
 
-    # В историю заведение записываем
-    # только после отправки
+    # Если кнопку вообще не нашли
+    if submit_button.count() == 0:
+
+        print()
+        print("Не удалось найти кнопку отправки.")
+        print("Кнопки на странице:")
+
+        buttons = page.locator(
+            '[role="button"], button'
+        )
+
+        for i in range(buttons.count()):
+            try:
+                text = buttons.nth(i).inner_text().strip()
+
+                if text:
+                    print(
+                        f"  Кнопка {i}: {text!r}"
+                    )
+
+            except Exception:
+                pass
+
+        raise RuntimeError(
+            "Кнопка отправки Google Forms не найдена."
+        )
+
+
+    print(
+        f"Кнопок отправки найдено: "
+        f"{submit_button.count()}"
+    )
+
+    # Нажимаем кнопку РОВНО ОДИН РАЗ
+    submit_button.last.click(
+        timeout=15000
+    )
+
+
+    # Ждём реального подтверждения Google
+    confirmation = page.get_by_text(
+        re.compile(
+            r"(Ответ записан|Your response has been recorded)",
+            re.IGNORECASE
+        )
+    )
+
+    confirmation.wait_for(
+        state="visible",
+        timeout=15000
+    )
+
+    print(
+        "✓ Google подтвердил сохранение ответа"
+    )
+
+
+    # Только после подтверждения
+    # записываем заведение в историю
     remember_favorite_place(
         favorite_place
     )
@@ -1078,6 +1144,12 @@ def main():
     print(
         f"Запланировано: "
         f"{NUMBER_OF_RESPONSES}"
+    )
+    if successful != NUMBER_OF_RESPONSES:
+        raise RuntimeError(
+        f"Не все анкеты были отправлены. "
+        f"Успешно: {successful}, "
+        f"нужно: {NUMBER_OF_RESPONSES}"
     )
 
 
