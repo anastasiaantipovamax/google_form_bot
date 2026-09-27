@@ -10,7 +10,7 @@ import re
 # =====================================================
 
 # Ссылка на Google-форму
-FORM_URL = "https://forms.gle/uiYK7bLJ6efBdtvA7"
+FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSd3l-DSwfxQsKsjP3rL-twMUN3OZME1h6FpyTy6hpzihkm1Sg/viewform"
 
 # Используем уже установленный на Mac Google Chrome
 CHROME_PATH = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"

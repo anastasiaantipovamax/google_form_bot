@@ -2,4 +2,13 @@ venv/
 __pycache__/
 *.pyc
 .DS_Store
-error_*.png
+error_*.png.telegram_token
+
+.telegram_token
+.telegram_token
+bot_data.db
+runner.log
+.runner_pid
+telegram_control_before_final.py
+bot_database_before_final.py
+bot_keyboards_before_final.py
