@@ -3,6 +3,7 @@ import random
 import json
 import os
 import re
+import sys
 
 
 # =====================================================
@@ -1054,28 +1055,31 @@ def main():
     successful = 0
 
     with sync_playwright() as p:
-        # Если бот запущен внутри GitHub Actions
-        if os.getenv("GITHUB_ACTIONS") == "true":
 
-            print("Запуск в GitHub Actions")
+        # macOS — используем установленный Google Chrome
+        if sys.platform == "darwin" and os.path.exists(CHROME_PATH):
 
-            browser = p.chromium.launch(
-                headless=True,
-                channel="chrome"
-            )
-
-        # Если запускаем на своём Mac
-        else:
-
-            print("Запуск на Mac")
+            print("Запуск на Mac через Google Chrome")
 
             browser = p.chromium.launch(
                 headless=True,
                 executable_path=CHROME_PATH
             )
 
+        # Linux / VPS / GitHub Actions
+        else:
 
-        page = browser.new_page()
+            print("Запуск через Playwright Chromium")
+
+            browser = p.chromium.launch(
+                headless=True,
+                args=[
+                    "--disable-dev-shm-usage"
+                ]
+            )
+
+
+        page = browser.new_page()()
 
         for number in range(
             1,
