@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from telegram.request import HTTPXRequest
 
 
 from telegram import (
@@ -2137,13 +2138,19 @@ def main():
         encoding="utf-8"
     ).strip()
 
+    telegram_request = HTTPXRequest(
+        proxy="socks5://127.0.0.1:9050"
+    )
+
     app = (
         Application
         .builder()
         .token(token)
+        .request(telegram_request)
         .post_init(post_init)
         .build()
     )
+        
 
     conversation = ConversationHandler(
 
